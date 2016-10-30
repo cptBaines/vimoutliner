@@ -128,8 +128,12 @@ endfunction
 function! SetBox(char)
    substitute/\[.\]/\="[".expand(a:char)."]"/
    if a:char == 'X'
+      call SetDone(".")
       call SetPercent(".",100)
    elseif a:char == '_'
+      let l = line(".")
+      exe '/DONE: /d'
+      exe l
       call SetPercent(".",0)
    endif
 endfunction
@@ -230,6 +234,14 @@ function! SetPercent(line,proportion)
    	call setline(a:line,substitute(getline(a:line)," [0-9]*%"," ".a:proportion."%",""))
    endif
 endf
+
+function! SetDone(line)
+	echo 'done'
+	let levels = '										'
+	let ident = indent(a:line)/&tabstop
+	let donefmt = printf('%%.%dsDONE: %s', (ident+1), strftime('%F %T'))
+	let l = append(a:line, printf(donefmt, levels))
+endfunction	
 
 " IncPercent(line) {{{1
 " Increments the percent doneness by 10%
